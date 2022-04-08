@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 import moment from 'moment';
 import 'moment/locale/pt-br';
@@ -21,6 +22,7 @@ import commonStyles from '../commonStyles.js';
 import TodayImage from '../../assets/imgs/today.jpg';
 import Task from '../components/Task';
 import AdicionarTask from './AdicionarTask';
+import {server, mostrarErro, sucesso} from '../common';
 
 LogBox.ignoreLogs([
   "[react-native-gesture-handler] Seems like you're using an old API with gesture components, check out new Gestures system!",
@@ -35,6 +37,10 @@ const initialState = {
 
 export default class TaskList extends Component {
   state = {...initialState};
+
+  componentDidMount() {
+    this.getTasks();
+  }
 
   render() {
     const today = moment().locale('pt-br').format('ddd, D [de] MMMM');
@@ -91,45 +97,44 @@ export default class TaskList extends Component {
     );
   }
 
+  getTasks = async () => {
+    const tasks = await axios.get(`${server}/tasks`);
+    let state = initialState;
+    state.tasks = tasks.data;
+    this.setState(state, this.mostrarOcultarTasksConcluidas);
+  };
+
   addTask = newTask => {
     if (newTask.descricao && newTask.descricao.trim()) {
-      let tasks = [...this.state.tasks];
-
-      tasks.push({
-        id: newTask.id,
-        descricao: newTask.descricao,
-        dataEstimada: newTask.dataEstimada,
-        dataConclusao: null,
-      });
-
-      this.setState(
-        {tasks, mostrarAdicionarTask: false},
-        this.mostrarOcultarTasksConcluidas,
-      );
+      axios
+        .post(`${server}/tasks`, {
+          descricao: newTask.descricao,
+          dataEstimada: newTask.dataEstimada,
+          dataConclusao: null,
+        })
+        .then(_ => {
+          sucesso('Dados gravados com sucesso!');
+          this.getTasks();
+        })
+        .catch(e => mostrarErro(e));
     } else {
       Alert.alert('Alerta', 'Descrição inválida!', [{text: 'OK'}]);
-      return;
     }
   };
 
   deleteTask = id => {
-    let tasks = [...this.state.tasks];
-    let indexItem = tasks.map(f => f.id).indexOf(id);
-    tasks.splice(indexItem, 1);
-    this.setState({tasks}, this.mostrarOcultarTasksConcluidas);
+    axios
+      .delete(`${server}/tasks/${id}`)
+      .then(_ => this.getTasks())
+      .catch(e => mostrarErro(e));
   };
 
-  marcarDesmarcarVisibilidade = () => {
-    this.setState(
-      {mostrarTasksConcluidas: !this.state.mostrarTasksConcluidas},
-      this.mostrarOcultarTasksConcluidas,
-    );
-  };
-
-  componentDidMount = async () => {
-    const stateString = await AsyncStorage.getItem('state');
-    const state = JSON.parse(stateString) || initialState;
-    this.setState(state, this.mostrarOcultarTasksConcluidas);
+  /* Comunicação indireta */
+  verificarMarcacaoTask = id => {
+    axios
+      .put(`${server}/tasks/${id}/alterar`)
+      .then(_ => this.getTasks())
+      .catch(e => mostrarErro(e));
   };
 
   mostrarOcultarTasksConcluidas = () => {
@@ -142,21 +147,6 @@ export default class TaskList extends Component {
     }
 
     this.setState({tasksVisiveis});
-
-    AsyncStorage.setItem('state', JSON.stringify(this.state));
-  };
-
-  /* Comunicação indireta */
-  verificarMarcacaoTask = id => {
-    const tasks = [...this.state.tasks];
-    tasks.forEach(t => {
-      if (t.id === id && t.dataConclusao === null) {
-        t.dataConclusao = new Date();
-      } else if (t.id === id && t.dataConclusao !== null) {
-        t.dataConclusao = null;
-      }
-    });
-    this.setState({tasks}, this.mostrarOcultarTasksConcluidas);
   };
 }
 

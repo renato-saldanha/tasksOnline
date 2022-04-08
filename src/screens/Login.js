@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ImageBackground,
   TouchableOpacity,
-  Alert,
 } from 'react-native';
 
 import axios from 'axios';
@@ -33,26 +32,22 @@ export default class Login extends Component {
   };
 
   cadastrar = async () => {
-    try {
-      if (this.state.senha !== this.state.confirmacaoSenha) {
-        Alert.alert(
-          'Senhas diferentes',
-          'As senhas não conferem, favor verificar!',
-        );
-        return;
-      }
+    if (this.state.senha !== this.state.confirmacaoSenha) {
+      mostrarErro('As senhas não conferem, favor verificar');
+      return;
+    }
 
-      await axios.post(`${server}/cadastro`, {
+    await axios
+      .post(`${server}/cadastrar`, {
         nome: this.state.nome,
         email: this.state.email,
         senha: this.state.senha,
-      });
-
-      sucesso('Usuário cadastrado com sucesso!');
-      this.state.setState({...initialState});
-    } catch (e) {
-      mostrarErro(e);
-    }
+      })
+      .then(res => {
+        sucesso('Usuário cadastrado com sucesso!');
+        this.state.setState({...initialState});
+      })
+      .catch(e => mostrarErro(e));
   };
 
   logar = () => {
@@ -67,7 +62,9 @@ export default class Login extends Component {
         ] = `bearer ${res.data.token}`;
         this.props.navigation.navigate('TaskList');
       })
-      .catch(e => Alert.alert('Login não sucedido!', e));
+      .catch(_ =>
+        mostrarErro('Login não autorizado, verifique os dados inseridos!'),
+      );
   };
 
   render() {
