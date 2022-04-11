@@ -62,9 +62,7 @@ export default class Login extends Component {
         ] = `bearer ${res.data.token}`;
         this.props.navigation.navigate('TaskList');
       })
-      .catch(_ =>
-        mostrarErro('Login não autorizado, verifique os dados inseridos!'),
-      );
+      .catch(e => mostrarErro(`Login não autorizado, erro:${e}`));
   };
 
   render() {

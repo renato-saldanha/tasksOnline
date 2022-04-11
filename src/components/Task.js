@@ -17,9 +17,9 @@ import 'moment/locale/pt-br';
 
 export default props => {
   const estiloConcluidoOuNao =
-    props.dataConclusao != null ? {textDecorationLine: 'line-through'} : {};
+    props.dataconclusao != null ? {textDecorationLine: 'line-through'} : {};
 
-  const data = props.dataConclusao ? props.dataConclusao : props.dataEstimada;
+  const data = props.dataconclusao ? props.dataconclusao : props.dataestimada;
   const dataFormatada = moment(data)
     .locale('pt-br')
     .format('ddd, D [de] MMMM [de] YYYY');
@@ -68,7 +68,7 @@ export default props => {
           <TouchableWithoutFeedback
             onPress={() => props.verificarMarcacaoTask(props.id)}>
             <View style={styles.checkContainer}>
-              {getCheckView(props.dataConclusao)}
+              {getCheckView(props.dataconclusao)}
             </View>
           </TouchableWithoutFeedback>
           <View>

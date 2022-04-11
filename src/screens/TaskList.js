@@ -12,7 +12,6 @@ import {
   LogBox,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
 import moment from 'moment';
@@ -81,7 +80,6 @@ export default class TaskList extends Component {
                 {...this.state}
                 verificarMarcacaoTask={this.verificarMarcacaoTask}
                 deleteTask={this.deleteTask}
-                /* Comunicação indireta */
               />
             )}
           />
@@ -99,9 +97,7 @@ export default class TaskList extends Component {
 
   getTasks = async () => {
     const tasks = await axios.get(`${server}/tasks`);
-    let state = initialState;
-    state.tasks = tasks.data;
-    this.setState(state, this.mostrarOcultarTasksConcluidas);
+    this.setState({tasks: tasks.data}, this.mostrarOcultarTasksConcluidas);
   };
 
   addTask = newTask => {
@@ -109,7 +105,7 @@ export default class TaskList extends Component {
       axios
         .post(`${server}/tasks`, {
           descricao: newTask.descricao,
-          dataEstimada: newTask.dataEstimada,
+          dataEstimada: newTask.dataestimada,
           dataConclusao: null,
         })
         .then(_ => {
@@ -122,6 +118,13 @@ export default class TaskList extends Component {
     }
   };
 
+  marcarDesmarcarVisibilidade = () => {
+    this.setState(
+      {mostrarTasksConcluidas: !this.state.mostrarTasksConcluidas},
+      this.mostrarOcultarTasksConcluidas,
+    );
+  };
+
   deleteTask = id => {
     axios
       .delete(`${server}/tasks/${id}`)
@@ -129,7 +132,6 @@ export default class TaskList extends Component {
       .catch(e => mostrarErro(e));
   };
 
-  /* Comunicação indireta */
   verificarMarcacaoTask = id => {
     axios
       .put(`${server}/tasks/${id}/alterar`)
@@ -143,7 +145,7 @@ export default class TaskList extends Component {
     if (this.state.mostrarTasksConcluidas) {
       tasksVisiveis = this.state.tasks;
     } else {
-      tasksVisiveis = this.state.tasks.filter(t => t.dataConclusao === null);
+      tasksVisiveis = this.state.tasks.filter(t => t.dataconclusao === null);
     }
 
     this.setState({tasksVisiveis});
