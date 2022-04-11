@@ -16,8 +16,8 @@ import {server, mostrarErro, sucesso} from '../common';
 
 const initialState = {
   nome: '',
-  email: '',
-  senha: '',
+  email: 'ranalisesaldanha@gmail.com',
+  senha: '123456',
   confirmacaoSenha: '',
   novoUsuario: false,
 };
