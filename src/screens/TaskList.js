@@ -57,7 +57,7 @@ export default class TaskList extends Component {
             <TouchableWithoutFeedback
               onPress={this.marcarDesmarcarVisibilidade}>
               <Icon
-                name={this.state.mostrarTasksConcluidas ? 'eye-slash' : 'eye'}
+                name={this.state.mostrarTasksConcluidas ? 'eye' : 'eye-slash'}
                 size={20}
                 color="#FFD9"
               />
