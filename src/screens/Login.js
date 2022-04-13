@@ -31,6 +31,10 @@ export default class Login extends Component {
     this.state.novoUsuario ? this.cadastrar() : this.logar();
   };
 
+  formValidado = () => {
+    return this.state.email.contains('@') && this.state.senha.length() >= 6;
+  };
+
   cadastrar = async () => {
     if (this.state.senha !== this.state.confirmacaoSenha) {
       mostrarErro('As senhas não conferem, favor verificar');
@@ -60,7 +64,7 @@ export default class Login extends Component {
         axios.defaults.headers.common[
           'Authorization'
         ] = `bearer ${res.data.token}`;
-        this.props.navigation.navigate('TaskList');
+        this.props.navigation.navigate('Home');
       })
       .catch(e => mostrarErro(`Login não autorizado, erro:${e}`));
   };

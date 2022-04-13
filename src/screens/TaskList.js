@@ -58,7 +58,7 @@ export default class TaskList extends Component {
               onPress={this.marcarDesmarcarVisibilidade}>
               <Icon
                 name={this.state.mostrarTasksConcluidas ? 'eye' : 'eye-slash'}
-                size={20}
+                size={30}
                 color="#FFD9"
               />
             </TouchableWithoutFeedback>
@@ -96,19 +96,27 @@ export default class TaskList extends Component {
   }
 
   getTasks = async () => {
-    const tasks = await axios.get(`${server}/tasks`);
-    this.setState({tasks: tasks.data}, this.mostrarOcultarTasksConcluidas);
+    const maxData = moment()
+      .add({days: this.props.diasAFrente})
+      .format('YYYY-MM-DD 23:59:59');
+    await axios
+      .get(`${server}/tasks?date=${maxData}`)
+      .then(tasks =>
+        this.setState({tasks: tasks.data}, this.mostrarOcultarTasksConcluidas),
+      )
+      .catch(err => mostrarErro(err));
   };
 
-  addTask = newTask => {
+  addTask = async newTask => {
     if (newTask.descricao && newTask.descricao.trim()) {
-      axios
+      await axios
         .post(`${server}/tasks`, {
           descricao: newTask.descricao,
-          dataEstimada: newTask.dataestimada,
+          dataEstimada: newTask.dataEstimada,
           dataConclusao: null,
         })
         .then(_ => {
+          this.setState({mostrarAdicionarTask: false});
           sucesso('Dados gravados com sucesso!');
           this.getTasks();
         })
@@ -182,9 +190,10 @@ const styles = StyleSheet.create({
   },
   seeUnsee: {
     flexDirection: 'column',
-    justifyContent: 'flex-start',
     alignItems: 'flex-end',
-    padding: 15,
+    height: '100%',
+    width: '100%',
+    marginLeft: -5,
   },
   touchIncluirTask: {
     position: 'absolute',
