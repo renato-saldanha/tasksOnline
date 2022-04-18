@@ -1,11 +1,13 @@
-import React, {Component} from 'react';
-import {Button, SafeAreaView, StyleSheet, View} from 'react-native';
+import React from 'react';
+import {Button, SafeAreaView, StyleSheet} from 'react-native';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {NavigationContainer} from '@react-navigation/native';
 
 import Login from './screens/Login';
 import TaskList from './screens/TaskList';
+import Menu from './screens/Menu';
+import commonStyles from './commonStyles';
 
 const Drawer = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
@@ -13,31 +15,33 @@ const Stack = createNativeStackNavigator();
 const MenuStackNavigator = props => {
   return (
     <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName="Login"
-        screenOptions={{headerShown: false}}>
+      <Stack.Navigator screenOptions={menuConfig}>
         <Stack.Screen
           name="Login"
           component={Login}
-          options={({navigation}) => {
+          options={_ => {
             return {title: 'Login'};
           }}
         />
         <Stack.Screen
           name="Home"
           component={HomeDrawer}
-          options={({navigation}) => {
+          options={props => {
             return {title: 'Home'};
-          }}
-        />
+          }}>
+          {/* {props => <HomeDrawer {...props} />} */}
+        </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
   );
 };
 
-const HomeDrawer = _ => {
+const HomeDrawer = props => {
+  const {nome, email} = props.route.params;
   return (
-    <Drawer.Navigator screenOptions={screenOptions}>
+    <Drawer.Navigator
+      screenOptions={menuConfig}
+      drawerContent={props => <Menu {...props} nome={nome} email={email} />}>
       <Drawer.Screen name="Hoje" options={{title: 'Hoje'}}>
         {props => <TaskList {...props} title="Hoje" diasAFrente={0} />}
       </Drawer.Screen>
@@ -55,19 +59,18 @@ const HomeDrawer = _ => {
 };
 
 export default props => {
-  return (
-    <SafeAreaView style={styles.container}>
-      <MenuStackNavigator {...props} />
-    </SafeAreaView>
-  );
+  return <MenuStackNavigator {...props} />;
 };
 
-const screenOptions = {
-  headerStyle: {
-    backgroundColor: 'black',
+const menuConfig = {
+  headerShown: false,
+  labelStyle: {
+    fontFamily: commonStyles.fontFamily,
+    fontWeight: 'normal',
+    fontSize: 20,
   },
-  headerTintColor: '#fff',
-  headerTintStyle: {
+  activeLabelStyle: {
+    colors: '#080',
     fontWeight: 'bold',
   },
 };

@@ -19,6 +19,9 @@ import 'moment/locale/pt-br';
 
 import commonStyles from '../commonStyles.js';
 import TodayImage from '../../assets/imgs/today.jpg';
+import Tomorrow from '../../assets/imgs/tomorrow.jpg';
+import Week from '../../assets/imgs/week.jpg';
+import Month from '../../assets/imgs/month.jpg';
 import Task from '../components/Task';
 import AdicionarTask from './AdicionarTask';
 import {server, mostrarErro, sucesso} from '../common';
@@ -52,7 +55,7 @@ export default class TaskList extends Component {
           onSave={this.addTask}
         />
 
-        <ImageBackground source={TodayImage} style={styles.background}>
+        <ImageBackground source={this.getImage()} style={styles.background}>
           <View style={styles.seeUnsee}>
             <TouchableWithoutFeedback
               onPress={this.marcarDesmarcarVisibilidade}>
@@ -86,7 +89,7 @@ export default class TaskList extends Component {
         </View>
 
         <TouchableOpacity
-          style={styles.touchIncluirTask}
+          style={[styles.touchIncluirTask, {backgroundColor: this.getColor()}]}
           onPress={() => this.setState({mostrarAdicionarTask: true})}
           activeOpacity={0.7}>
           <Icon name="plus" size={20} color={commonStyles.colors.secondary} />
@@ -105,6 +108,32 @@ export default class TaskList extends Component {
         this.setState({tasks: tasks.data}, this.mostrarOcultarTasksConcluidas),
       )
       .catch(err => mostrarErro(err));
+  };
+
+  getImage = () => {
+    switch (this.props.diasAFrente) {
+      case 0:
+        return TodayImage;
+      case 1:
+        return Tomorrow;
+      case 7:
+        return Week;
+      case 30:
+        return Month;
+    }
+  };
+
+  getColor = () => {
+    switch (this.props.diasAFrente) {
+      case 0:
+        return commonStyles.colors.today;
+      case 1:
+        return commonStyles.colors.tomorrow;
+      case 7:
+        return commonStyles.colors.week;
+      case 30:
+        return commonStyles.colors.month;
+    }
   };
 
   addTask = async newTask => {
@@ -191,9 +220,8 @@ const styles = StyleSheet.create({
   seeUnsee: {
     flexDirection: 'column',
     alignItems: 'flex-end',
-    height: '100%',
-    width: '100%',
-    marginLeft: -5,
+    marginRight: 8,
+    marginTop: 8,
   },
   touchIncluirTask: {
     position: 'absolute',
@@ -203,7 +231,6 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: commonStyles.colors.today,
     justifyContent: 'center',
     alignItems: 'center',
   },

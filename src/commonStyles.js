@@ -7,6 +7,6 @@ export default {
     today: '#B13b49',
     tomorrow: '#FADA5E',
     week: '#32612D',
-    month: '#2832C2',
+    month: '#1631BE',
   },
 };
