@@ -7,30 +7,19 @@ import {NavigationContainer} from '@react-navigation/native';
 import Login from './screens/Login';
 import TaskList from './screens/TaskList';
 import Menu from './screens/Menu';
+import AuthOrApp from './screens/AuthOrApp';
 import commonStyles from './commonStyles';
 
 const Drawer = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
 
-const MenuStackNavigator = props => {
+const MenuStackNavigator = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={menuConfig}>
-        <Stack.Screen
-          name="Login"
-          component={Login}
-          options={_ => {
-            return {title: 'Login'};
-          }}
-        />
-        <Stack.Screen
-          name="Home"
-          component={HomeDrawer}
-          options={props => {
-            return {title: 'Home'};
-          }}>
-          {/* {props => <HomeDrawer {...props} />} */}
-        </Stack.Screen>
+      <Stack.Navigator screenOptions={menuConfig} initialRouteName="AuthOrApp">
+        <Stack.Screen name="AuthOrApp" component={AuthOrApp} />
+        <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="Home" component={HomeDrawer} />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -38,10 +27,11 @@ const MenuStackNavigator = props => {
 
 const HomeDrawer = props => {
   const {nome, email} = props.route.params;
+
   return (
     <Drawer.Navigator
       screenOptions={menuConfig}
-      drawerContent={props => <Menu {...props} nome={nome} email={email} />}>
+      drawerContent={props => <Menu {...props} email={email} nome={nome} />}>
       <Drawer.Screen name="Hoje" options={{title: 'Hoje'}}>
         {props => <TaskList {...props} title="Hoje" diasAFrente={0} />}
       </Drawer.Screen>
@@ -58,8 +48,8 @@ const HomeDrawer = props => {
   );
 };
 
-export default props => {
-  return <MenuStackNavigator {...props} />;
+export default () => {
+  return <MenuStackNavigator />;
 };
 
 const menuConfig = {
@@ -69,14 +59,5 @@ const menuConfig = {
     fontWeight: 'normal',
     fontSize: 20,
   },
-  activeLabelStyle: {
-    colors: '#080',
-    fontWeight: 'bold',
-  },
+  activeTintColor: '#080',
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});

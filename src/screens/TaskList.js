@@ -10,6 +10,7 @@ import {
   TouchableWithoutFeedback,
   TouchableOpacity,
   LogBox,
+  Platform,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
@@ -56,7 +57,15 @@ export default class TaskList extends Component {
         />
 
         <ImageBackground source={this.getImage()} style={styles.background}>
-          <View style={styles.seeUnsee}>
+          <View style={styles.iconBar}>
+            <TouchableOpacity
+              onPress={() => this.props.navigation.openDrawer()}>
+              <Icon
+                name="bars"
+                size={20}
+                color={commonStyles.colors.secondary}
+              />
+            </TouchableOpacity>
             <TouchableWithoutFeedback
               onPress={this.marcarDesmarcarVisibilidade}>
               <Icon
@@ -80,7 +89,6 @@ export default class TaskList extends Component {
             renderItem={({item}) => (
               <Task
                 {...item}
-                {...this.state}
                 verificarMarcacaoTask={this.verificarMarcacaoTask}
                 deleteTask={this.deleteTask}
               />
@@ -118,7 +126,7 @@ export default class TaskList extends Component {
         return Tomorrow;
       case 7:
         return Week;
-      case 30:
+      default:
         return Month;
     }
   };
@@ -131,7 +139,7 @@ export default class TaskList extends Component {
         return commonStyles.colors.tomorrow;
       case 7:
         return commonStyles.colors.week;
-      case 30:
+      default:
         return commonStyles.colors.month;
     }
   };
@@ -217,11 +225,11 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginBottom: 30,
   },
-  seeUnsee: {
-    flexDirection: 'column',
-    alignItems: 'flex-end',
-    marginRight: 8,
-    marginTop: 8,
+  iconBar: {
+    flexDirection: 'row',
+    marginHorizontal: 20,
+    justifyContent: 'space-between',
+    marginTop: Platform.OS === 'ios' ? 40 : 10,
   },
   touchIncluirTask: {
     position: 'absolute',

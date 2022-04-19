@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import loginImagem from '../../assets/imgs/login.jpg';
 import commonStyles from '../commonStyles';
@@ -16,8 +17,8 @@ import {server, mostrarErro, sucesso} from '../common';
 
 const initialState = {
   nome: '',
-  email: 'ranalisesaldanha@gmail.com',
-  senha: '123456',
+  email: '',
+  senha: '',
   confirmacaoSenha: '',
   novoUsuario: false,
 };
@@ -61,6 +62,7 @@ export default class Login extends Component {
         senha: this.state.senha,
       })
       .then(res => {
+        AsyncStorage.setItem('dadosUsuario', JSON.stringify(res.data));
         axios.defaults.headers.common[
           'Authorization'
         ] = `bearer ${res.data.token}`;
